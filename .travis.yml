@@ -29,7 +29,7 @@ script:
 
  - ./configure $FLAGS --host=x86_64-w64-mingw32
  - make install -j4
- - cd $PREFIX; zip -0rq $PWD/psp2-tools-$REV-x86_64-w64-mingw32.zip *
+ - (cd $PREFIX; zip -0rq $PWD/psp2-tools-$REV-x86_64-w64-mingw32.zip *)
 
 after_success:
  - curl -q -T psp2-tools-$REV-amd64-pc-linux-gnu.tar -u $FTP ftp://wololo.net/
