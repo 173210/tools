@@ -1,0 +1,42 @@
+---
+# Copyright (C) 2015 PSP2SDK Project
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+sudo: required
+
+before_install:
+ - set -e
+
+ - sudo add-apt-repository -y ppa:win-cross-dev/win-cross
+ - sudo apt-get update -qq -y
+ - sudo apt-get install -qq -y gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64 libssl-dev mingw64-openssl
+
+script:
+ - export REV=$(git describe --always)
+
+ - aclocal
+ - automake --add-missing
+ - autoconf
+
+ - ./configure $FLAGS
+ - make install -j4
+ - make clean
+ - tar -C $PREFIX -c * -f $PWD/psp2-tools-$REV-amd64-pc-linux-gnu.tar
+ - rm -Rf $PREFIX
+
+ - ./configure $FLAGS --host=x86_64-w64-mingw32
+ - make install -j4
+ - cd $PREFIX; zip -0rq $PWD/psp2-tools-$REV-x86_64-w64-mingw32.zip *
+
+after_success:
+ - curl -q -T psp2-tools-$REV-amd64-pc-linux-gnu.tar -u $FTP ftp://wololo.net/
+ - curl -q -T psp2-tools-$REV-x86_64-w64-mingw32.zip -u $FTP ftp://wololo.net/
+
+env:
+ global:
+  - PREFIX="$PWD/dist"
+  - FLAGS="-q --with-silent-rules --prefix=$PREFIX"
+  - secure: "AFnCFR4c4r2+djyhLNSh+EtURo1/RY6mQoa7aoa9BdBzzLGfnvEXKBfY4bPp4vVUo/fOFV7sb3865MuUa9aJQe4WfONMRwWQKhp9OB/EJ0jhuG2+KKKckZZJVWaCGEFOZKmS6mn/1Ecesk2vJhYX2XCzgUzH57J2rQJoyPbvFsrLKGdg5MR4mz2SxUYuYnDLTXmBsJOL+b9pzt19nysxV026nYWVBXXyGvAYqQvZY0B0q+RDpVjuuKm9AP0QI7cPR3r4F+qvPPJGGmZc5uxdMiSLJ0ImtXZc27/nk0kGl7BIb97qS2rINLqV0Xhw9D/TKFKTOn8Pz5keA8gMTD3sA0IFYersffJ9uTOO3OoY1FRdnBF8kWb4meWh/jCuBW+ebl4cl25U0PTg+nwQfSDrBqmMhjqdcnLAiN+xTW++h5Vc1KNTMPgF4K0EJ2we+lyAswZxG9GFw3nWYtIacXBEKoATsfG1kHrEdb12bTkAT+sB9hTP4wxgBnogcSHcbJIkl1Odnp36ZBXrxcd4TsTSyEQBC1uRb9OQIitEqCNf+0wGfa/9du/Hhbo52PUN+lzq4OwUWSd+Xair2nR6xgedXK+k38LG/bI38ah/huTZWR6vC5Qpfsq6nQxd0HV881/WxlN7ifHBlAjQ6SgkHI54I0JNzZGmbZL41Ofh+kropm0="
