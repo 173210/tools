@@ -24,7 +24,7 @@ script:
  - ./configure $FLAGS
  - make install -j4
  - make clean
- - cd $PREFIX; tar -c * -f ../psp2-tools-$REV-amd64-pc-linux-gnu.tar
+ - (cd $PREFIX; tar -c * -f ../psp2-tools-$REV-amd64-pc-linux-gnu.tar)
  - rm -Rf $PREFIX
 
  - ./configure $FLAGS --host=x86_64-w64-mingw32
